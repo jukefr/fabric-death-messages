@@ -33,7 +33,7 @@ public class PlayerEvents implements DedicatedServerModInitializer {
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> PlayerEventsCommand.register(dispatcher));
 
         PlayerDeathCallback.EVENT.register((player, source) -> {
-            CONFIG.runDeathActions(player);
+            CONFIG.runDeathActions(player, source);
             return ActionResult.PASS;
         });
 

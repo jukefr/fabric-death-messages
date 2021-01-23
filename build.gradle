@@ -49,7 +49,7 @@ allprojects {
         mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
         modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
         modImplementation "io.github.bymartrixx.wdmcf:wdmcf:1.0.1"
     }
@@ -118,8 +118,8 @@ repositories {
 
 dependencies {
     // used by the test mod
-    modImplementation fabricApi.module("fabric-api-base", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-command-api-v1", rootProject.fabric_api_version)
+    modImplementation fabricApi.module("fabric-api-base", rootProject.fabric_version)
+    modImplementation fabricApi.module("fabric-command-api-v1", rootProject.fabric_version)
 
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
@@ -221,10 +221,10 @@ curseforge {
         addGameVersion '1.16.4'
         addGameVersion 'Fabric'
         mainArtifact(remapJar) {
-            displayName = "Player Events $version $project.valid_minecraft_version"
+            displayName = "Player Events $version $project.minecraft_version"
         }
         addArtifact(project(':player-events-api').buildDir.absolutePath + "/libs/" + project(':player-events-api').name + "-${project.version}.jar") {
-            displayName = "Player Events API $version $project.valid_minecraft_version"
+            displayName = "Player Events API $version $project.minecraft_version"
         }
         afterEvaluate {
             uploadTask.dependsOn("remapJar")
