@@ -223,5 +223,30 @@ There are probably some yesEntity or noEntity sources that were omitted, feel fr
 
 For every other field in `actions` you can define multiple commands, `death` is the only exception.
 
-**Supports [color codes](https://minecraft.gamepedia.com/Formatting_codes#Color_codes) too!**
+## Formatting
+
+```
+0 is black
+1 is dark blue
+2 is dark green
+3 is dark aqua
+4 is dark red
+5 is dark purple
+6 is gold
+7 is gray
+8 is dark gray
+9 is blue
+a is green
+b is aqua
+c is red
+d is light purple
+e is yellow
+f is white
+----------------------------------------------------
+k is obfuscated
+l is bold
+m is strikethrough
+n is underline
+o is italic
+```
 
