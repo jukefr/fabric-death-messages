@@ -24,12 +24,12 @@ public class TestCommand {
                 })
                 .build();
 
-        LiteralCommandNode<ServerCommandSource> deathNode = literal("death")
-                .executes(context -> {
-                    PlayerEvents.CONFIG.testDeathActions(context.getSource());
-                    return 1;
-                })
-                .build();
+//        LiteralCommandNode<ServerCommandSource> deathNode = literal("death")
+//                .executes(context -> {
+//                    PlayerEvents.CONFIG.testDeathActions(context.getSource());
+//                    return 1;
+//                })
+//                .build();
 
         LiteralCommandNode<ServerCommandSource> killPlayerNode = literal("kill_player")
                 .executes(context -> {
@@ -54,7 +54,7 @@ public class TestCommand {
 
         testNode.addChild(joinNode);
         testNode.addChild(leaveNode);
-        testNode.addChild(deathNode);
+//        testNode.addChild(deathNode);
         testNode.addChild(killPlayerNode);
         testNode.addChild(killEntityNode);
         testNode.addChild(everyNode);

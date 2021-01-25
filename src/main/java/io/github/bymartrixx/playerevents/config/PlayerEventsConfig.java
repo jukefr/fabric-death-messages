@@ -7,13 +7,15 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.network.MessageType;
+import net.minecraft.network.packet.s2c.play.CombatEventS2CPacket;
+import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 
 import java.io.*;
 
@@ -69,22 +71,26 @@ public class PlayerEventsConfig {
         }
     }
 
-    private final Actions death;
+    private final DeathActions death;
     private final Actions join;
     private final Actions killEntity;
     private final Actions killPlayer;
     private final Actions leave;
 
+
     public PlayerEventsConfig() {
-        this.death = new Actions();
+        this.death = new DeathActions();
         this.join = new Actions();
         this.killPlayer = new Actions();
         this.killEntity = new Actions();
         this.leave = new Actions();
     }
 
-    public String[] getDeathActions() {
-        return this.death.actions;
+    public String[][] getDeathNoEntity() {
+        return this.death.noEntity;
+    }
+    public String[][] getDeathYesEntity() {
+        return this.death.yesEntity;
     }
 
     public String[] getJoinActions() {
@@ -104,150 +110,27 @@ public class PlayerEventsConfig {
     }
 
     public void runDeathActions(ServerPlayerEntity player, DamageSource source) {
-        // TODO: add ${source}?
         MinecraftServer server = player.getServer();
         if (server == null)
             return;
 
         if (source.getAttacker() == null) {
-            String name = source.getName();
-            switch (name) {
-                case "fall":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} a pris un coup de yesfall", player), true);
-                    break;
-                case "lava":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} lava", player), true);
-                    break;
-                case "drown":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} drown", player), true);
-                    break;
-                case "inWall":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} suffocated", player), true);
-                    break;
-                case "hotFloor":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} magma block", player), true);
-                    break;
-                case "flyIntoWall":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} elytra", player), true);
-                    break;
-                case "wither":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} wither", player), true);
-                    break;
-                case "outOfWorld":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} void", player), true);
-                    break;
-                case "inFire":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} campfire", player), true);
-                    break;
-                case "onFire":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} fire tick", player), true);
-                    break;
-                case "cactus":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} cactus", player), true);
-                    break;
-                case "indirectMagic":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} potion", player), true);
-                    break;
-                case "lightningBolt":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} lightningBolt", player), true);
-                    break;
-                case "starve":
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} starvation", player), true);
-                    break;
-                default:
-                    Utils.sendMessage(server, player, Utils.replaceGetText("${player} a mourru", player), true);
-                    break;
+            for (String[] noEntity : death.noEntity) {
+                if (noEntity[0].equals(source.getName()) && noEntity.length > 1) {
+                        Utils.sendMessage(server, player, Utils.replaceGetText(noEntity[1], player), death.broadcastToEveryone);
+                        return;
+                }
             }
-
         } else {
-            EntityType<?> type = source.getAttacker().getType();
-            // u cant do a switch on custom types topkek java
-            if (EntityType.ZOMBIE.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("imagine ${player} il se fait zlatan par un zombie mdr", player), true);
-            } else if (EntityType.SLIME.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} s'est pris une grosse faciale de slime", player), true);
-            } else if (EntityType.SKELETON.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} skelly", player), true);
-            } else if (EntityType.HUSK.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} HUSK", player), true);
-            } else if (EntityType.SPIDER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} SPIDER", player), true);
-            } else if (EntityType.CAVE_SPIDER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} CAVE_SPIDER", player), true);
-            } else if (EntityType.WITHER_SKELETON.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} WITHER_SKELETON", player), true);
-            } else if (EntityType.WITHER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} WITHER", player), true);
-            } else if (EntityType.ENDER_DRAGON.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} ENDER_DRAGON", player), true);
-            } else if (EntityType.ELDER_GUARDIAN.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} ELDER_GUARDIAN", player), true);
-            } else if (EntityType.TNT.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} TNT", player), true);
-            } else if (EntityType.CREEPER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} CREEPER", player), true);
-            } else if (EntityType.GHAST.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} GHAST", player), true);
-            } else if (EntityType.ENDERMAN.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} ENDERMAN", player), true);
-            } else if (EntityType.SILVERFISH.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} SILVERFISH", player), true);
-            } else if (EntityType.WITCH.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} WITCH", player), true);
-            } else if (EntityType.SHULKER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} SHULKER", player), true);
-            } else if (EntityType.GUARDIAN.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} GUARDIAN", player), true);
-            } else if (EntityType.IRON_GOLEM.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} IRON_GOLEM", player), true);
-            } else if (EntityType.ZOMBIE_VILLAGER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} ZOMBIE_VILLAGER", player), true);
-            } else if (EntityType.ENDERMITE.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} ENDERMITE", player), true);
-            } else if (EntityType.PHANTOM.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} PHANTOM", player), true);
-            } else if (EntityType.DROWNED.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} DROWNED", player), true);
-            } else if (EntityType.PILLAGER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} PILLAGER", player), true);
-            } else if (EntityType.RAVAGER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} RAVAGER", player), true);
-            } else if (EntityType.ILLUSIONER.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} ILLUSIONER", player), true);
-            } else if (EntityType.BEE.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} BEE", player), true);
-            } else if (EntityType.WOLF.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} WOLF", player), true);
-            } else if (EntityType.LLAMA.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} LLAMA", player), true);
-            } else if (EntityType.BLAZE.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} BLAZE", player), true);
-            } else if (EntityType.STRAY.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} STRAY", player), true);
-            } else if (EntityType.VEX.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} VEX", player), true);
-            } else if (EntityType.VINDICATOR.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} VINDICATOR", player), true);
-            } else if (EntityType.PUFFERFISH.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} PUFFERFISH", player), true);
-            } else if (EntityType.POLAR_BEAR.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} POLAR_BEAR", player), true);
-            } else if (EntityType.DOLPHIN.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} DOLPHIN", player), true);
-            } else if (EntityType.PANDA.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} PANDA", player), true);
-            } else if (EntityType.HOGLIN.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} HOGLIN", player), true);
-            } else if (EntityType.PIGLIN.equals(type) || EntityType.PIGLIN_BRUTE.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} PIGLIN", player), true);
-            } else if (EntityType.ZOGLIN.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} ZOGLIN", player), true);
-            } else if (EntityType.ZOMBIFIED_PIGLIN.equals(type)) {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} ZOMBIFIED_PIGLIN", player), true);
-            } else {
-                Utils.sendMessage(server, player, Utils.replaceGetText("${player} s'est fait zlatan", player), true);
+            String type = source.getAttacker().getType().toString();
+            for (String[] yesEntity : death.yesEntity) {
+                if (yesEntity[0].equals(type) && yesEntity.length > 1) {
+                    Utils.sendMessage(server, player, Utils.replaceGetText(yesEntity[1], player), death.broadcastToEveryone);
+                    return;
+                }
             }
         }
+        server.getPlayerManager().broadcastChatMessage(player.getDamageTracker().getDeathMessage(), MessageType.SYSTEM, Util.NIL_UUID);
     }
 
     public void runJoinActions(MinecraftServer server, ServerPlayerEntity player) {
@@ -296,20 +179,20 @@ public class PlayerEventsConfig {
         }
     }
 
-    public void testDeathActions(ServerCommandSource source) {
-        String message = "Death actions (" + (death.broadcastToEveryone ? "Send to everyone" : "Send only to the player") + "):";
-        source.sendFeedback(new LiteralText(message).formatted(Formatting.GRAY, Formatting.ITALIC), false);
-        for (String action : death.actions) {
-            try {
-                ServerPlayerEntity player = source.getPlayer();
-                Text text = action.charAt(0) == '/' ? new LiteralText(Utils.replace(action, player)) : Utils.replaceGetText(action, player);
-                Utils.sendMessage(source, text);
-            } catch (CommandSyntaxException e) {
-                Text text = action.charAt(0) == '/' ? new LiteralText(Utils.replace(action, "${player}", source.getName())) : Utils.replaceGetText(action, "${player}", source.getDisplayName());
-                Utils.sendMessage(source, text);
-            }
-        }
-    }
+//    public void testDeathActions(ServerCommandSource source) {
+//        String message = "Death actions (" + (death.broadcastToEveryone ? "Send to everyone" : "Send only to the player") + "):";
+//        source.sendFeedback(new LiteralText(message).formatted(Formatting.GRAY, Formatting.ITALIC), false);
+//        for (String action : death.actions) {
+//            try {
+//                ServerPlayerEntity player = source.getPlayer();
+//                Text text = action.charAt(0) == '/' ? new LiteralText(Utils.replace(action, player)) : Utils.replaceGetText(action, player);
+//                Utils.sendMessage(source, text);
+//            } catch (CommandSyntaxException e) {
+//                Text text = action.charAt(0) == '/' ? new LiteralText(Utils.replace(action, "${player}", source.getName())) : Utils.replaceGetText(action, "${player}", source.getDisplayName());
+//                Utils.sendMessage(source, text);
+//            }
+//        }
+//    }
 
     public void testJoinActions(ServerCommandSource source) {
         String message = "Join actions (" + (join.broadcastToEveryone ? "Send to everyone" : "Send only to the player") + "):";
@@ -400,7 +283,7 @@ public class PlayerEventsConfig {
     }
 
     public void testEveryActionGroup(ServerCommandSource source) {
-        testDeathActions(source);
+//        testDeathActions(source);
         testJoinActions(source);
         testKillEntityActions(source);
         testKillPlayerActions(source);
@@ -413,6 +296,76 @@ public class PlayerEventsConfig {
 
         public Actions() {
             this.actions = new String[]{};
+            this.broadcastToEveryone = true;
+        }
+    }
+
+    public static class DeathActions {
+        private final String[][] noEntity;
+        private final String[][] yesEntity;
+        private final boolean broadcastToEveryone;
+
+        public DeathActions() {
+            this.noEntity = new String[][]{
+                    {"cactus", "${player} was pricked to death"},
+                    {"drown"},
+                    {"fall"},
+                    {"flyIntoWall"},
+                    {"hotFloor"},
+                    {"inFire"},
+                    {"inWall"},
+                    {"indirectMagic"},
+                    {"lava"},
+                    {"lightningBolt"},
+                    {"onFire"},
+                    {"outOfWorld"},
+                    {"starve"},
+                    {"wither"},
+            };
+            this.yesEntity = new String[][]{
+                    {"entity.minecraft.bee", "${player} was stung to death"},
+                    {"entity.minecraft.blaze"},
+                    {"entity.minecraft.cave_spider"},
+                    {"entity.minecraft.creeper"},
+                    {"entity.minecraft.dolphin"},
+                    {"entity.minecraft.drowned"},
+                    {"entity.minecraft.elder_guardian"},
+                    {"entity.minecraft.ender_dragon"},
+                    {"entity.minecraft.enderman"},
+                    {"entity.minecraft.endermite"},
+                    {"entity.minecraft.ghast"},
+                    {"entity.minecraft.guardian"},
+                    {"entity.minecraft.hoglin"},
+                    {"entity.minecraft.husk"},
+                    {"entity.minecraft.illusioner"},
+                    {"entity.minecraft.iron_golem"},
+                    {"entity.minecraft.llama"},
+                    {"entity.minecraft.panda"},
+                    {"entity.minecraft.phantom"},
+                    {"entity.minecraft.piglin"},
+                    {"entity.minecraft.piglin_brute"},
+                    {"entity.minecraft.pillager"},
+                    {"entity.minecraft.polar_bear"},
+                    {"entity.minecraft.pufferfish"},
+                    {"entity.minecraft.ravager"},
+                    {"entity.minecraft.shulker"},
+                    {"entity.minecraft.silverfish"},
+                    {"entity.minecraft.skeleton"},
+                    {"entity.minecraft.slime"},
+                    {"entity.minecraft.spider"},
+                    {"entity.minecraft.stray"},
+                    {"entity.minecraft.tnt"},
+                    {"entity.minecraft.vex"},
+                    {"entity.minecraft.vindicator"},
+                    {"entity.minecraft.witch"},
+                    {"entity.minecraft.wither"},
+                    {"entity.minecraft.wither_skeleton"},
+                    {"entity.minecraft.wolf"},
+                    {"entity.minecraft.zoglin"},
+                    {"entity.minecraft.zombie"},
+                    {"entity.minecraft.zombie_villager"},
+                    {"entity.minecraft.zombified_piglin"}
+            };
             this.broadcastToEveryone = true;
         }
     }

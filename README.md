@@ -1,7 +1,4 @@
-# Player Events
-
-[ ![Download](https://api.bintray.com/packages/bymartrixx/maven/player_events_api/images/download.svg) ](https://github.com/ByMartrixx/join-messages/releases/tag/1.0.0)
-[ ![Build Status](https://travis-ci.com/ByMartrixx/player-events.svg?branch=master)](https://travis-ci.com/ByMartrixx/player-events)
+# Fabric Death Messages
 
 <a href='https://www.curseforge.com/minecraft/mc-mods/fabric-api'><img src='https://i.imgur.com/Ol1Tcf8.png' width="150"></a>
 
@@ -14,8 +11,179 @@ The config file is located in the config directory (`config/player_events.json`)
 ```JSON
 {
   "death": {
-    "actions": [
-      "${player} just died! F"
+    "no_entity": [
+      [
+        "cactus",
+        "${player} was pricked to death"
+      ],
+      [
+        "drown"
+      ],
+      [
+        "fall"
+      ],
+      [
+        "flyIntoWall"
+      ],
+      [
+        "hotFloor"
+      ],
+      [
+        "inFire"
+      ],
+      [
+        "inWall"
+      ],
+      [
+        "indirectMagic"
+      ],
+      [
+        "lava"
+      ],
+      [
+        "lightningBolt"
+      ],
+      [
+        "onFire"
+      ],
+      [
+        "outOfWorld"
+      ],
+      [
+        "starve"
+      ],
+      [
+        "wither"
+      ]
+    ],
+    "yes_entity": [
+      [
+        "entity.minecraft.bee",
+        "${player} was stung to death"
+      ],
+      [
+        "entity.minecraft.blaze"
+      ],
+      [
+        "entity.minecraft.cave_spider"
+      ],
+      [
+        "entity.minecraft.creeper"
+      ],
+      [
+        "entity.minecraft.dolphin"
+      ],
+      [
+        "entity.minecraft.drowned"
+      ],
+      [
+        "entity.minecraft.elder_guardian"
+      ],
+      [
+        "entity.minecraft.ender_dragon"
+      ],
+      [
+        "entity.minecraft.enderman"
+      ],
+      [
+        "entity.minecraft.endermite"
+      ],
+      [
+        "entity.minecraft.ghast"
+      ],
+      [
+        "entity.minecraft.guardian"
+      ],
+      [
+        "entity.minecraft.hoglin"
+      ],
+      [
+        "entity.minecraft.husk"
+      ],
+      [
+        "entity.minecraft.illusioner"
+      ],
+      [
+        "entity.minecraft.iron_golem"
+      ],
+      [
+        "entity.minecraft.llama"
+      ],
+      [
+        "entity.minecraft.panda"
+      ],
+      [
+        "entity.minecraft.phantom"
+      ],
+      [
+        "entity.minecraft.piglin"
+      ],
+      [
+        "entity.minecraft.piglin_brute"
+      ],
+      [
+        "entity.minecraft.pillager"
+      ],
+      [
+        "entity.minecraft.polar_bear"
+      ],
+      [
+        "entity.minecraft.pufferfish"
+      ],
+      [
+        "entity.minecraft.ravager"
+      ],
+      [
+        "entity.minecraft.shulker"
+      ],
+      [
+        "entity.minecraft.silverfish"
+      ],
+      [
+        "entity.minecraft.skeleton"
+      ],
+      [
+        "entity.minecraft.slime"
+      ],
+      [
+        "entity.minecraft.spider"
+      ],
+      [
+        "entity.minecraft.stray"
+      ],
+      [
+        "entity.minecraft.tnt"
+      ],
+      [
+        "entity.minecraft.vex"
+      ],
+      [
+        "entity.minecraft.vindicator"
+      ],
+      [
+        "entity.minecraft.witch"
+      ],
+      [
+        "entity.minecraft.wither"
+      ],
+      [
+        "entity.minecraft.wither_skeleton"
+      ],
+      [
+        "entity.minecraft.wolf"
+      ],
+      [
+        "entity.minecraft.zoglin"
+      ],
+      [
+        "entity.minecraft.zombie"
+      ],
+      [
+        "entity.minecraft.zombie_villager"
+      ],
+      [
+        "entity.minecraft.zombified_piglin"
+      ]
     ],
     "broadcast_to_everyone": true
   },
@@ -49,91 +217,11 @@ The config file is located in the config directory (`config/player_events.json`)
 }
 ```
 
-On the JSON file you can declare, under the `actions` array on each `<event>` object, what is going to be sent and/or executed on that event. You can also set these messages to be sent only to the player by setting `broadcast_to_everyone` to `false`, but this won't work with events like `leave` (because the player isn't in the server anymore).
+For `death` you have sample keys to use, if no message is given as second argument then it is considered disabled and the default death message will be displayed.
 
-Every event has a `${player}` token, and each instance of this token will be replaced with the player that triggers the event. Other events have extra tokens that work the same way.
-As of 2.0.0, commands remain unsupported for these tokens and only `${player}` works correctly. This functionality will be added on a future release.
+There are probably some yesEntity or noEntity sources that were omitted, feel free to add them to your config file and everything should work.
+
+For every other field in `actions` you can define multiple commands, `death` is the only exception.
 
 **Supports [color codes](https://minecraft.gamepedia.com/Formatting_codes#Color_codes) too!**
 
-Use `/pe reload` or `/player_events reload` to reload the mod config.
-
-You can use `/pe test <event>` or `/player_events test <event>` to test the actions on a specific event, or use `/pe test *` to test every event.
-
-### 2.0.0 supported events
-* `death` - Executed when a player dies.
-* `join` - Executed when a player joins.
-* `kill_entity` - Executed when a player kills an entity. 
-  * **Extra tokens:**
-  * `${killedEntity}` - the killed entity.
-* `kill_player` - Executed when a player kills another player.
-  * **Extra tokens:**
-  * `${killedPlayer}` - the killed player.
-* `leave` - Executed when a player leaves.
-
-## Developing
-This part is for mod developers that would like to use the mod api.
-
-### Compiling
-
-1. Clone or download the repository
-2. On a command prompt run `gradlew build` to compile the mod. (If you only need the API files, you can run `gradlew player-events-api:build` instead)
-3. You'll find the compiled `.jar` files under `<repository>/build/libs` and `<repository>/player-events-api/build/libs`
-
-### API
-#### Adding the API as a dependency of your mod
-Add the following text to your `build.gradle`:
-```groovy
-repositories {
-    maven {
-        url 'https://dl.bintray.com/bymartrixx/maven'    
-    }
-}
-
-dependencies {
-    // Using the version from the gradle.properties
-    modImplementation "io.github.bymartrixx.playerevents:player-events-api:${project.player_events_api_version}"
-
-    // Directly setting the version
-    modImplementation "io.github.bymartrixx.playerevents:player-events-api:2.0.0"
-}
-```
-Add this to your `gradle.properties` (Only if you aren't directly setting the version to the build.gradle file):
-```properties
-player_events_api_version = 2.0.0
-```
-
-Also, add this to your `fabric.mod.json`:
-```json
-{
-  "depends": {
-    "player_events_api": ">=2.0.0"
-  }
-}
-```
-
-#### Events
-* `death` - `io.github.bymartrixx.playerevents.api.event.PlayerDeathCallback.EVENT`
-* `join` - `io.github.bymartrixx.playerevents.api.event.PlayerJoinCallback.EVENT`
-* `kill_entity` - `io.github.bymartrixx.playerevents.api.event.PlayerKillEntityCallback.EVENT`
-* `kill_player` - `io.github.bymartrixx.playerevents.api.event.PlayerKillPlayerCallback.EVENT`
-* `leave` - `io.github.bymartrixx.playerevents.api.event.PlayerLeaveCallback.EVENT`
-
-**Note: The package `io.github.bymartrixx.player_events.api` has been moved to `io.github.bymartrixx.playerevents.api`. 1.0.0 classes still work but are now deprecated and will likely be removed in a next release. Please update your classes ASAP**
-
-#### Using the events
-```java
-public class FooMod implements DedicatedServerModInitializer {
-    public void onInitializeServer() {
-        PlayerDeathCallback.EVENT.register((player, source) -> {
-            // Do something
-            return ActionResult.PASS;
-        });
-
-        PlayerKillEntityCallback.EVENT.register((player, killedEntity) -> {
-            // Do something
-            return ActionResult.PASS;
-        });
-    }
-}
-```
